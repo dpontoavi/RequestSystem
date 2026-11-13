@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.dpontoavi.ServerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-13T02:26:36.648Z" hostname="DAVI" time="2.428">
+  <properties/>
+  <testcase name="test root endpoint" classname="com.dpontoavi.ServerTest" time="2.424"/>
+  <system-out><![CDATA[2026-11-12 23:26:37.933 [DefaultDispatcher-worker-2 @call-context#3] INFO  io.ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-11-12 23:26:38.844 [DefaultDispatcher-worker-2 @call-context#3] INFO  io.ktor.test - Application started in 0.931 seconds.
+2026-11-12 23:26:38.846 [DefaultDispatcher-worker-1 @coroutine#6] INFO  io.ktor.test - Responding at http://localhost:80
+2026-11-12 23:26:38.846 [DefaultDispatcher-worker-1 @coroutine#6] INFO  io.ktor.test - Responding at https://localhost:443
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
