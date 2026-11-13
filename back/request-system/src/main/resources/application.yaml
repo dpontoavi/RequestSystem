@@ -1,0 +1,10 @@
+ktor:
+  deployment:
+    port: 8080
+  application:
+    modules:
+      - com.dpontoavi.HttpKt.configureHttp
+      - com.dpontoavi.SerializationKt.configureSerialization
+      - com.dpontoavi.StatusPagesKt.configureStatusPages
+      - com.dpontoavi.ExposedKt.configureExposed
+      - com.dpontoavi.RoutingKt.configureRouting
