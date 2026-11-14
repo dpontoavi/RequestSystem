@@ -10,6 +10,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
+import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
@@ -49,6 +50,13 @@ fun Route.TaskRoutes(service: TaskService) {
                 return@put call.respond(HttpStatusCode.NotFound, "Solicitação com id: ${id} não encontrado para atualizar")
             }
             call.respond(updated)
+        }
+        patch("/{id}") {
+            val id = call.parameters["id"]?.toIntOrNull()
+            if (id == null) {
+                return@patch call.respond(HttpStatusCode.BadRequest)
+            }
+            call.respond(service.advanceStatus(id))
         }
         delete("/{id}") {
             val id = call.parameters["id"]?.toIntOrNull()
