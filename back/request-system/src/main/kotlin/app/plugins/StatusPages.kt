@@ -1,5 +1,6 @@
 package com.dpontoavi.app
 
+import app.models.InvalidTaskDataException
 import app.models.InvalidTransitionException
 import app.models.TaskNotFoundException
 import io.ktor.http.*
@@ -16,7 +17,10 @@ fun Application.configureStatusPages() {
             call.respondText(text = "404: $cause", status = HttpStatusCode.NotFound)
         }
         exception<InvalidTransitionException> { call, cause ->
-            call.respondText(text = "409: $cause", status = (HttpStatusCode.Conflict))
+            call.respondText(text = "409: $cause", status = HttpStatusCode.Conflict)
+        }
+        exception<InvalidTaskDataException> { call, cause ->
+            call.respondText(text = "409: $cause", status = HttpStatusCode.Conflict)
         }
     }
 }
