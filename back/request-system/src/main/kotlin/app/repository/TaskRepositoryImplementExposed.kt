@@ -70,6 +70,10 @@ class TaskRepositoryImplementExposed : TaskRepository {
             .toList()
     }
 
+    override suspend fun updateStatus(currentStatus: Status): TaskModel? {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun create(task: TaskModel): TaskModel = suspendTransaction {
         val insertedId = TaskTable.insert {
             it[title] = task.title
