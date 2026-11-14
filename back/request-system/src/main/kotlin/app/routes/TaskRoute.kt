@@ -1,20 +1,23 @@
 package app.routes
 
+import app.models.InvalidQueryException
+import app.models.Priority
+import app.models.Status
 import app.models.TaskModel
 import app.services.TaskService
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.http.HttpRequestLifecycle
-import io.ktor.server.http.httpDateFormat
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
+import io.ktor.server.routing.param
 import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 
+@OptIn(ExperimentalStdlibApi::class)
 fun Route.TaskRoutes(service: TaskService) {
     route("/api/requests") {
         get {
@@ -23,17 +26,24 @@ fun Route.TaskRoutes(service: TaskService) {
         get("/{id}") {
             val id = call.parameters["id"]?.toIntOrNull()
             if (id == null) {
-                call.respond(HttpStatusCode.BadRequest, "Não existe solicitação com esse ID")
+                call.respond(HttpStatusCode.BadRequest, "Id inválido")
                 return@get
             }
         }
-        get("/{title}") {
-            val title = call.parameters["title"]?.lowercase()
-            if (title == null) {
-                call.respond(HttpStatusCode.BadRequest, "Não há solicitação com esse título")
-                return@get
+        get {
+            val params = call.request.queryParameters
+            val status = params["status"]?.let { raw ->
+                Status.entries.firstOrNull { it.name == raw.uppercase() }
+                    ?: throw InvalidQueryException("Status '$raw' não existe")
             }
-            call.respond(service.getTaskByName(title))
+            val priority = params["priority"]?.let { raw ->
+                Priority.entries.firstOrNull { it.name == raw.uppercase() }
+                    ?: throw InvalidQueryException("Priority '$raw' não existe")
+            }
+            val title = params["title"]?.takeIf { it.isNotBlank() }
+            val category = params["category"]?.takeIf { it.isNotBlank() }
+            call.respond(service.searchTask(title, status, priority, category))
+
         }
         post {
             val task = call.receive<TaskModel>()
