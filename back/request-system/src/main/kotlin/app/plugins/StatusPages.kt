@@ -16,7 +16,7 @@ fun Application.configureStatusPages() {
             call.respondText(text = "404: $cause", status = HttpStatusCode.NotFound)
         }
         exception<InvalidTransitionException> { call, cause ->
-            call.respondText(text = "409: $cause", status(HttpStatusCode.Conflict))
+            call.respondText(text = "409: $cause", status = (HttpStatusCode.Conflict))
         }
     }
 }
