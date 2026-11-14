@@ -9,7 +9,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.flow.toList
+import org.h2.util.Task
+import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.lowerCase
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.like
@@ -42,31 +45,21 @@ class TaskRepositoryImplementExposed : TaskRepository {
             .singleOrNull()
     }
 
-    override suspend fun findByName(name: String): List<TaskModel> = suspendTransaction {
-        TaskTable
-            .selectAll()
-            .where { TaskTable.title.lowerCase() like "%${name.lowercase()}%" }
-            .map { it.toTask() }
-            .toList()
-    }
-
-    override suspend fun findByCategory(category: String): List<TaskModel> = suspendTransaction {
+    override suspend fun searchTask(
+        title: String?,
+        status: Status?,
+        priority: Priority?,
+        category: String?
+    ): List<TaskModel> = suspendTransaction {
         TaskTable.selectAll()
-            .where { TaskTable.category.lowerCase() like "%${category.lowercase()}%" }
-            .map { it.toTask() }
-            .toList()
-    }
-
-    override suspend fun findByPriority(priority: Priority): List<TaskModel> = suspendTransaction {
-        TaskTable.selectAll()
-            .where { TaskTable.priority eq priority }
-            .map { it.toTask() }
-            .toList()
-    }
-
-    override suspend fun findByStatus(status: Status): List<TaskModel> = suspendTransaction {
-        TaskTable.selectAll()
-            .where { TaskTable.status eq status }
+            .where {
+                val conditions = mutableSetOf<Op<Boolean>>()
+                if (title != null) conditions.add(TaskTable.title eq title)
+                if (status != null) conditions.add(TaskTable.status eq status)
+                if (priority != null) conditions.add(TaskTable.priority eq priority)
+                if (category != null) conditions.add(TaskTable.category eq category)
+                conditions.reduceOrNull {a, b -> a and b } ?: Op.TRUE
+            }
             .map { it.toTask() }
             .toList()
     }
