@@ -5,4 +5,4 @@ class TaskNotFoundException(id: Int) :
 class InvalidTransitionException(status: Status) :
         RuntimeException("A solicitação tentou avançar para um estado além de '$status'")
 class InvalidTaskDataException(task: TaskModel) :
-        RuntimeException("Solicitação enviada possui Status '${task.status}' e não '${Status.ABERTA}")
+        RuntimeException("Solicitação enviada possui dados inválidos")
