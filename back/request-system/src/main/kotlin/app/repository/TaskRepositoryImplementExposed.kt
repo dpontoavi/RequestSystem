@@ -4,6 +4,7 @@ import app.database.TaskTable
 import app.models.Priority
 import app.models.Status
 import app.models.TaskModel
+import app.models.next
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.singleOrNull
@@ -70,8 +71,15 @@ class TaskRepositoryImplementExposed : TaskRepository {
             .toList()
     }
 
-    override suspend fun updateStatus(currentStatus: Status): TaskModel? {
-        TODO("Not yet implemented")
+    override suspend fun updateStatus(id: Int,newStatus: Status): TaskModel? = suspendTransaction {
+            val updatedTaskStatus = TaskTable.update({ TaskTable.id eq id}) {
+                it[status] = newStatus
+            }
+            if (updatedTaskStatus == 0) null
+            else TaskTable.selectAll()
+                .where { TaskTable.id eq id }
+                .map { it.toTask() }
+                .singleOrNull()
     }
 
     override suspend fun create(task: TaskModel): TaskModel = suspendTransaction {

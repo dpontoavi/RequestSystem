@@ -11,7 +11,7 @@ interface TaskRepository {
     suspend fun findByCategory(category: String): List<TaskModel>
     suspend fun findByPriority(priority: Priority): List<TaskModel>
     suspend fun findByStatus(status: Status): List<TaskModel>
-    suspend fun updateStatus(currentStatus: Status): TaskModel?
+    suspend fun updateStatus(id: Int, newStatus: Status): TaskModel?
     suspend fun create(task: TaskModel): TaskModel
     suspend fun update(id: Int, task: TaskModel): TaskModel?
     suspend fun delete(id: Int): Boolean
