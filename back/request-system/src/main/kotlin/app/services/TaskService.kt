@@ -10,6 +10,9 @@ import app.models.TaskNotFoundException
 import app.models.next
 import app.repository.TaskRepository
 import jdk.jfr.Category
+import org.jetbrains.exposed.v1.r2dbc.R2dbcDatabase
+import org.jetbrains.exposed.v1.r2dbc.SchemaUtils
+import org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
 
 class TaskService (private val repository: TaskRepository) {
     suspend fun getAllTasks() = repository.findAll()
@@ -24,7 +27,13 @@ class TaskService (private val repository: TaskRepository) {
         return repository.updateStatus(id, nextStatus)?: throw TaskNotFoundException(id)
     }
     suspend fun create(task: TaskModel): TaskModel {
-        val newtask = task.copy(id = 0, status = Status.ABERTA)
+        val invalids = buildList {
+            if (task.title.isBlank()) add("title")
+            if (task.desc.isBlank()) add("desc")
+            if (task.category.isBlank()) add("category")
+        }
+        if (invalids.isNotEmpty()) throw InvalidTaskDataException("Campos obrigatórios vazios ${invalids.joinToString(", ")}")
+        val newtask = task.copy(id = 0, status = Status.ABERTA, title = task.title.trim(), desc = task.desc.trim(), category = task.category.trim())
         return repository.create(newtask)
     }
     suspend fun update(id: Int, task: TaskModel) = repository.update(id,task)
