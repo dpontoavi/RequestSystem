@@ -1,0 +1,17 @@
+.idea
+.vscode
+.gradle/
+build/
+.kotlin/
+*.iml
+out/
+node_modules/
+dist/
+*.mv.db
+*.trace.db
+.env
+.env.*
+local.properties
+*.log
+.DS_Store
+Thumbs.db
