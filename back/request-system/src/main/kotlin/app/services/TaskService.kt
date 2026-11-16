@@ -1,6 +1,5 @@
 package app.services
 
-import app.database.TaskTable
 import app.models.InvalidTaskDataException
 import app.models.InvalidTransitionException
 import app.models.Priority
@@ -9,10 +8,6 @@ import app.models.TaskModel
 import app.models.TaskNotFoundException
 import app.models.next
 import app.repository.TaskRepository
-import jdk.jfr.Category
-import org.jetbrains.exposed.v1.r2dbc.R2dbcDatabase
-import org.jetbrains.exposed.v1.r2dbc.SchemaUtils
-import org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
 
 class TaskService (private val repository: TaskRepository) {
     suspend fun getAllTasks() = repository.findAll()

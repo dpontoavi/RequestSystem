@@ -3,7 +3,6 @@ package app.repository
 import app.models.Priority
 import app.models.Status
 import app.models.TaskModel
-import jdk.jfr.Category
 
 interface TaskRepository {
     suspend fun findAll(): List<TaskModel>
