@@ -27,6 +27,7 @@ fun Route.TaskRoutes(service: TaskService) {
                 call.respond(HttpStatusCode.BadRequest, "Id inválido")
                 return@get
             }
+            call.respond(service.getTaskById(id))
         }
         get {
             val params = call.request.queryParameters
