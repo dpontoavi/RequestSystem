@@ -1,5 +1,5 @@
 import client from './client';
-import { type Task } from '../types';
+import { type Priority, type Status, type Task } from '../types';
 
 export async function getTasks(): Promise<Task[]> {
   const response = await client.get<Task[]>('/api/requests');
@@ -22,5 +22,9 @@ export async function deleteTask(id: number): Promise<void> {
 }
 export async function advanceTaskStatus(id: number): Promise<Task> {
   const response = await client.patch<Task>(`/api/requests/${id}`);
+  return response.data;
+}
+export async function searchTasks(filters?: { status?: Status; priority?: Priority; title?: string }): Promise<Task[]> {
+  const response = await client.get<Task[]>(`/api/requests`, { params: filters });
   return response.data;
 }
