@@ -88,20 +88,57 @@ export function HomePage() {
   }, []);
 
   if (loading) {
-    return <p>Carregando Solicitações</p>;
+    return (
+    <>
+      <div className="sticky top-0 z-10 flex flex-row bg-gradient-to-r from-blue-800 to-purple-600 p-4">
+        <button
+        
+          >
+          <img src="https://unpkg.com/lucide-static@1.75.0/icons/search.svg" alt="Search" className="w-6 h-6 mr-2 bg-[#6a71d9] h-10 w-auto rounded-xl p-1 hover:bg-white transition-colors duration-200" />  
+        </button>
+        </div>
+      <p className="text-gray-500 text-lg text-center p-32">Carregando Solicitações</p>
+    </>
+    );
   }
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <>
+        <div className="sticky top-0 z-10 flex flex-row bg-gradient-to-r from-blue-800 to-purple-600 p-4">
+        <button
+        
+          >
+          <img src="https://unpkg.com/lucide-static@1.75.0/icons/search.svg" alt="Search" className="w-6 h-6 mr-2 bg-[#6a71d9] h-10 w-auto rounded-xl p-1 hover:bg-white transition-colors duration-200" />  
+        </button>
+        </div>
+        <p className="text-gray-500 text-lg text-center p-32">{error}</p>
+      </>
+      );
   }
   if (!tasks || tasks.length === 0) {
-    return <p>Nenhuma Solicitação encontrada</p>;
+    return (
+      <>
+        <div className="sticky top-0 z-10 flex flex-row bg-gradient-to-r from-blue-800 to-purple-600 p-4">
+        <button
+        
+          >
+          <img src="https://unpkg.com/lucide-static@1.75.0/icons/search.svg" alt="Search" className="w-6 h-6 mr-2 bg-[#6a71d9] h-10 w-auto rounded-xl p-1 hover:bg-white transition-colors duration-200" />  
+        </button>
+        </div>
+        <p className="text-gray-500 text-lg text-center p-32">Nenhuma Solicitação encontrada</p>
+      </>
+    );
   }
 
   return (
     <div>
       { /* Toolbar */}
       <div className="sticky top-0 z-10 flex flex-row bg-gradient-to-r from-blue-800 to-purple-600 p-4">
-        <img src="https://unpkg.com/lucide-static@1.75.0/icons/search.svg" alt="Search" className="w-6 h-6 mr-2" />
+        <button
+        
+          >
+          <img src="https://unpkg.com/lucide-static@1.75.0/icons/search.svg" alt="Search" className="w-6 h-6 mr-2 bg-[#6a71d9] h-10 w-auto rounded-xl p-1 hover:bg-white transition-colors duration-200" />  
+        </button>
       </div>
       { /* Tasks section */}
       <div className="flex-1 p-4">
