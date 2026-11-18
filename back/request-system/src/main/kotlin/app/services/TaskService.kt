@@ -11,7 +11,7 @@ import app.repository.TaskRepository
 
 class TaskService (private val repository: TaskRepository) {
     suspend fun getAllTasks() = repository.findAll()
-    suspend fun getTaskById(id: Int) = repository.findById(id)
+    suspend fun getTaskById(id: Int): TaskModel = repository.findById(id)?: throw TaskNotFoundException(id)
     suspend fun searchTask(title: String? = null,
                            status: Status? = null,
                            priority: Priority? = null,
