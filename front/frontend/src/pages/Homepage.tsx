@@ -56,15 +56,15 @@ export function HomePage() {
 
 
   //real api call
-  /*useEffect(() => {
+  useEffect(() => {
     getTasks()
       .then(setTasks)
       .catch(() => setError("Failed to fetch tasks"))
       .finally(() => setLoading(false))
-  }); */
+  });
 
   //test only
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchTasks = async () => {
       try {
         setLoading(true);
@@ -128,7 +128,7 @@ export function HomePage() {
     };
 
     fetchTasks();
-  }, []);
+  }, []); */
 
   if (loading) {
     return (
