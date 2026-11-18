@@ -5,7 +5,7 @@ import viteLogo from './assets/vite.svg'
 import './App.css'
 import { Route, Routes } from 'react-router'
 import { LandingPage } from './pages/LandingPage'
-import { HomePage } from './pages/HomePage'
+import { HomePage } from './pages/Homepage'
 
 function App() {
   const [count, setCount] = useState(0)
