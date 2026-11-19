@@ -291,12 +291,12 @@ export function HomePage() {
       </div>
       <div className="flex-1 p-4">
         <h1 className="text-6xl font-bold mb-4 p-5">Solicitações</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 p-4">
           {tasks.map((task) => (
             <div key={task.id} className="bg-gray-300 rounded-4xl shadow-md p-4 drop-shadow-xl/15 hover:drop-shadow-xl/25 transition-shadow duration-1000">
               <div className="flex flex-col py-4">
                 <span className="text-xl font-bold mb-2">{task.title}</span>
-                <span className="h-29 text-gray-600 bg-white rounded-2xl p-3">{task.desc}</span>
+                <textarea className="h-29 text-gray-600 bg-white rounded-2xl p-3">{task.desc}</textarea>
               </div>
               <div className="flex flex-row justify-between items-center mt-4 p-4">
                 <div className={`rounded-2xl p-2 flex flex-row items-center ${getStatusStyles(task.status)}`}>
