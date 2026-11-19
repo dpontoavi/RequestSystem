@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react"
 import type { Priority, Status, Task } from "../types"
-import { getTasks, searchTasks } from "../api/tasks";
+import { createTask, getTasks, searchTasks } from "../api/tasks";
+import NewTaskModal from "../components/NewTaskModal";
 
 
 const statuses: Status[] = ["ABERTA", "EM_ANDAMENTO", "CONCLUIDA"];
@@ -33,6 +34,7 @@ export function HomePage() {
   const [ statusFilter, setStatusFilter ] = useState<Status | "">("");
   const [ priorityFilter, setPriorityFilter ] = useState<Priority | "">("");
   const [ categoryFilter, setCategoryFilter ] = useState<string>("");
+  const [ showModal, setShowModal ] = useState<boolean>(false);
 
   const handleSearch = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -53,6 +55,11 @@ export function HomePage() {
       setLoading(false);
     }
   };
+  const handleCreateTask = async (task: Omit<Task, 'id'>) => {
+    const newTask = await createTask(task);
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+    setShowModal(false);
+  }
 
 
   //real api call
@@ -164,7 +171,7 @@ export function HomePage() {
       </>
       );
   }
-  if (!tasks || tasks.length === 0) {
+  if (!tasks.length) {
     return (
       <>
         <div className="sticky top-0 z-10 flex flex-row bg-gradient-to-r from-blue-800 to-purple-600 p-4">
@@ -177,7 +184,20 @@ export function HomePage() {
           <img src="https://unpkg.com/lucide-static@1.75.0/icons/search.svg" alt="" className="w-10 h-10 mr-2 bg-[#6a71d9] rounded-xl p-2 hover:bg-white transition-colors duration-200" />
         </button>
         </div>
-        <p className="text-gray-500 text-lg text-center p-32">Nenhuma Solicitação encontrada</p>
+        <div className=" z-20 flex flex-col p-4 justify-center items-center">
+          <p className="flex text-gray-500 text-lg text-center p-32">Nenhuma Solicitação encontrada</p>
+        
+          <button onClick={() => setShowModal(true)}
+            className=" bg-radial-[at_25%_25%] from-blue-600 to-blue-400 to-75% text-white rounded-2xl flex w-120 h-16 text-4xl p-4 items-center justify-center hover:from-cyan-300 hover:to-cyan-400 transition-colors duration-400">
+            Crie a primeira Solicitação
+          </button>
+          {showModal && (
+            <NewTaskModal
+              onClose={() => setShowModal(false)}
+              onTaskCreated={handleCreateTask}
+            />
+          )}
+        </div>
       </>
     );
   }
@@ -243,8 +263,17 @@ export function HomePage() {
         </form>
       </div>
       { /* Tasks section */}
-      <div className="fixed bottom-8 right-8 z-20 flex flex-row p-4 flex justify-between items-center">
-        <button className="leading-0 bg-radial-[at_25%_25%] from-blue-600 to-blue-400 to-75% text-white rounded-full flex h-16 w-16 text-4xl items-center justify-center hover:from-cyan-300 hover:to-cyan-400 transition-colors duration-400">+</button>
+      <div className="fixed bottom-8 right-8 z-20 flex flex-row p-4 justify-between items-center">
+        <button onClick={() => setShowModal(true)} 
+          className="leading-0 bg-radial-[at_25%_25%] from-blue-600 to-blue-400 to-75% text-white rounded-full flex h-16 w-16 text-4xl items-center justify-center hover:from-cyan-300 hover:to-cyan-400 transition-colors duration-400">
+            +
+          </button>
+          {showModal && (
+            <NewTaskModal
+              onClose={() => setShowModal(false)}
+              onTaskCreated={handleCreateTask}
+            />
+          )}
       </div>
       <div className="flex-1 p-4">
         <h1 className="text-6xl font-bold mb-4 p-5">Solicitações</h1>
