@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react"
 import type { NewTask, Priority, Status, Task } from "../types"
-import { createTask, getTasks, searchTasks } from "../api/tasks";
+import { advanceTaskStatus, createTask, getTasks, searchTasks } from "../api/tasks";
 import NewTaskModal from "../components/NewTaskModal";
 
 
@@ -61,7 +61,19 @@ export function HomePage() {
     setTasks((prevTasks) => [...prevTasks, newTask]);
     setShowModal(false);
   }
-
+  const handleAdvanceTaskStatus = async (taskId: number) => {
+    setPendingId(taskId);
+    try {
+      const updatedTask = await advanceTaskStatus(taskId);
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => (task.id === taskId ? updatedTask : task))
+      );
+    } catch (error) {
+      setError("Failed to advance task status");
+    } finally {
+      setPendingId(null);
+    }
+  }
 
   //real api call
   useEffect(() => {
@@ -288,7 +300,10 @@ export function HomePage() {
               <div className="flex flex-row justify-between items-center mt-4 p-4">
                 <div className={`rounded-2xl p-2 flex flex-row items-center ${getStatusStyles(task.status)}`}>
                   <span className="text-sm">{formatLabel(task.status)}</span>
-                  <button className=" leading-0 bg-blue-500 text-white rounded-full w-8 h-8 flex text-xl items-center justify-center ml-2">+</button>
+                  <button onClick={() => handleAdvanceTaskStatus(task.id)} disabled={pendingId === task.id} 
+                    className=" leading-0 bg-blue-500 text-white rounded-full w-8 h-8 flex text-xl items-center justify-center ml-2">
+                    +
+                  </button>
                 </div>
                 <div className={`rounded-2xl p-2 ${getPriorityStyles(task.priority)}`}>
                   <span className="text-sm">{formatLabel(task.priority)}</span>

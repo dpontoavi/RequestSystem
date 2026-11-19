@@ -18,13 +18,14 @@ export async function updateTask(id: number, task: Omit<Task, 'id'>): Promise<Ta
   return response.data;
 }
 export async function deleteTask(id: number): Promise<void> {
-  await client.delete(`/api/requests/${id}`);
+  const response = await client.delete(`/api/requests/${id}`);
+  return response.data;
 }
 export async function advanceTaskStatus(id: number): Promise<Task> {
   const response = await client.patch<Task>(`/api/requests/${id}`);
   return response.data;
 }
-export async function searchTasks(filters?: { status?: Status; priority?: Priority; title?: string, category?: string }): Promise<Task[]> {
+export async function searchTasks(filters?: { status?: Status; priority?: Priority; title?: string }): Promise<Task[]> {
   const response = await client.get<Task[]>(`/api/requests`, { params: filters });
   return response.data;
 }
