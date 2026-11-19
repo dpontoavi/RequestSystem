@@ -13,8 +13,9 @@ function formatLabel(value: string): string {
 }
 
 function getStatusStyles(status: string): string {
-  if (status === "ABERTA") return "bg-green-100 text-green-700";
-  if (status === "EM_ANDAMENTO" || status === "CONCLUIDA") return "bg-purple-100 text-purple-700";
+  if (status === "ABERTA") return "bg-green-200 text-green-700";
+  if (status === "EM_ANDAMENTO") return "bg-purple-200 text-purple-700";
+  if (status === "CONCLUIDA") return "bg-blue-200 text-blue-700";
   return "bg-gray-100 text-gray-700";
 }
 
@@ -159,7 +160,7 @@ export function HomePage() {
           onClick={() => setSearchOpen((open) => !open)}
           aria-expanded={searchOpen}
           aria-label="Toggle task search"
-          className="z-10 shrink-0">
+          className="z-10 shrink-0 cursor-pointer">
           <img src="https://unpkg.com/lucide-static@1.75.0/icons/search.svg" alt="" className="w-10 h-10 mr-2 bg-[#6a71d9] rounded-xl p-2 hover:bg-white transition-colors duration-200" />
         </button>
         </div>
@@ -176,7 +177,7 @@ export function HomePage() {
           onClick={() => setSearchOpen((open) => !open)}
           aria-expanded={searchOpen}
           aria-label="Toggle task search"
-          className="z-10 shrink-0">
+          className="z-10 shrink-0 cursor-pointer">
           <img src="https://unpkg.com/lucide-static@1.75.0/icons/search.svg" alt="" className="w-10 h-10 mr-2 bg-[#6a71d9] rounded-xl p-2 hover:bg-white transition-colors duration-200" />
         </button>
         </div>
@@ -193,7 +194,7 @@ export function HomePage() {
           onClick={() => setSearchOpen((open) => !open)}
           aria-expanded={searchOpen}
           aria-label="Toggle task search"
-          className="z-10 shrink-0">
+          className="z-10 shrink-0 cursor-pointer">
           <img src="https://unpkg.com/lucide-static@1.75.0/icons/search.svg" alt="" className="w-10 h-10 mr-2 bg-[#6a71d9] rounded-xl p-2 hover:bg-white transition-colors duration-200" />
         </button>
         </div>
@@ -225,7 +226,7 @@ export function HomePage() {
           onClick={() => setSearchOpen((open) => !open)}
           aria-expanded={searchOpen}
           aria-label="Toggle task search"
-          className="z-10 shrink-0">
+          className="z-10 shrink-0 cursor-pointer">
           <img src="https://unpkg.com/lucide-static@1.75.0/icons/search.svg" alt="" className="w-10 h-10 mr-2 bg-[#6a71d9] rounded-xl p-2 hover:bg-white transition-colors duration-200" />
         </button>
         <form
@@ -278,7 +279,7 @@ export function HomePage() {
       { /* Tasks section */}
       <div className="fixed bottom-8 right-8 z-20 flex flex-row p-4 justify-between items-center">
         <button onClick={() => setShowModal(true)} 
-          className="leading-0 bg-radial-[at_25%_25%] from-blue-600 to-blue-400 to-75% text-white rounded-full flex h-16 w-16 text-4xl items-center justify-center hover:from-cyan-300 hover:to-cyan-400 transition-colors duration-400">
+          className="leading-none  bg-radial-[at_25%_25%] items-center from-blue-600 to-blue-400 to-75% text-white rounded-full flex h-16 w-16 text-4xl items-center justify-center hover:from-cyan-300 hover:to-cyan-400 transition-colors duration-400">
             +
           </button>
           {showModal && (
@@ -300,8 +301,9 @@ export function HomePage() {
               <div className="flex flex-row justify-between items-center mt-4 p-4">
                 <div className={`rounded-2xl p-2 flex flex-row items-center ${getStatusStyles(task.status)}`}>
                   <span className="text-sm">{formatLabel(task.status)}</span>
-                  <button onClick={() => handleAdvanceTaskStatus(task.id)} disabled={pendingId === task.id} 
-                    className=" leading-0 bg-blue-500 text-white rounded-full w-8 h-8 flex text-xl items-center justify-center ml-2">
+                  <button onClick={() => handleAdvanceTaskStatus(task.id)} 
+                    disabled={pendingId === task.id || task.status === "CONCLUIDA"} 
+                    className=" leading-0 bg-blue-500 text-white rounded-full w-8 h-8 flex text-xl items-center justify-center items-center cursor-pointer disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed ml-2">
                     +
                   </button>
                 </div>
