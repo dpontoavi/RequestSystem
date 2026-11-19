@@ -35,6 +35,7 @@ export function HomePage() {
   const [ priorityFilter, setPriorityFilter ] = useState<Priority | "">("");
   const [ categoryFilter, setCategoryFilter ] = useState<string>("");
   const [ showModal, setShowModal ] = useState<boolean>(false);
+  const [ pendingId, setPendingId ] = useState<number | null>(null);
 
   const handleSearch = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
