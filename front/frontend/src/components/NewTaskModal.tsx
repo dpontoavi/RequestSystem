@@ -1,19 +1,18 @@
 import { useState } from "react";
-import type { Task, Status, Priority } from "../types";
+import type { Task, Status, Priority, NewTask } from "../types";
 
 interface newTaskModalProps {
   onClose: () => void;
-  onTaskCreated: (task: Omit<Task, 'id'>) => void;
+  onTaskCreated: (task: Omit<NewTask, 'id'>) => void;
 }
-const emptyTask = {
+const emptyTask: NewTask = {
     title: '',
-    description: '',
-    status: 'ABERTA' as Status,
-    priority: 'BAIXA' as Priority,
+    desc: '',
     category: '',
+    priority: 'BAIXA',
 };
 export default function NewTaskModal({ onClose, onTaskCreated }: newTaskModalProps) {
-    const [form, setForm] = useState(emptyTask);
+    const [form, setForm] = useState<NewTask>(emptyTask);
     
     function set(field: string, value: string | number) {
         setForm((prev) => ({ ...prev, [field]: value }));
@@ -28,17 +27,10 @@ export default function NewTaskModal({ onClose, onTaskCreated }: newTaskModalPro
                         <input placeholder="Título" onChange={(e) => set('title', e.target.value)} />
                     </Field>
                     <Section label="Descrição">
-                        <textarea placeholder="Descrição" onChange={(e) => set('description', e.target.value)} />
+                        <textarea placeholder="Descrição" onChange={(e) => set('desc', e.target.value)} />
                     </Section>
                     <Section label="Informações">
                         <Row>
-                            <Field label="Status">
-                                <select onChange={(e) => set('status', e.target.value)}>
-                                    <option value="ABERTA">Aberta</option>
-                                    <option value="EM_ANDAMENTO">Em Andamento</option>
-                                    <option value="CONCLUIDA">Concluída</option>
-                                </select>
-                            </Field>
                             <Field label="Prioridade">
                                 <select onChange={(e) => set('priority', e.target.value)}>
                                     <option value="">Selecione</option>
