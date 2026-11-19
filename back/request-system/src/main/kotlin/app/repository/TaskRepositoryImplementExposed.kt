@@ -14,6 +14,7 @@ import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.r2dbc.deleteWhere
 import org.jetbrains.exposed.v1.r2dbc.insert
+import org.jetbrains.exposed.v1.r2dbc.select
 import org.jetbrains.exposed.v1.r2dbc.selectAll
 import org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
 import org.jetbrains.exposed.v1.r2dbc.update
@@ -25,7 +26,8 @@ class TaskRepositoryImplementExposed : TaskRepository {
         title = this[TaskTable.title],
         desc = this[TaskTable.desc],
         category = this[TaskTable.category],
-        priority = this[TaskTable.priority]
+        priority = this[TaskTable.priority],
+        status = this[TaskTable.status]
     )
 
     override suspend fun findAll(): List<TaskModel> = suspendTransaction {
@@ -61,14 +63,14 @@ class TaskRepositoryImplementExposed : TaskRepository {
     }
 
     override suspend fun updateStatus(id: Int,newStatus: Status): TaskModel? = suspendTransaction {
-            val updatedTaskStatus = TaskTable.update({ TaskTable.id eq id}) {
+        val updatedTaskStatus = TaskTable.update({ TaskTable.id eq id}) {
                 it[status] = newStatus
             }
-            if (updatedTaskStatus == 0) null
+        if (updatedTaskStatus == 0) null
             else TaskTable.selectAll()
-                .where { TaskTable.id eq id }
-                .map { it.toTask() }
-                .singleOrNull()
+                    .where { TaskTable.id eq id }
+                    .map { it.toTask() }
+                    .singleOrNull()
     }
 
     override suspend fun create(task: TaskModel): TaskModel = suspendTransaction {
