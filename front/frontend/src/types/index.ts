@@ -1,7 +1,7 @@
 export interface Task {
   id: number;
   title: string;
-  description: string;
+  desc: string;
   status: Status;
   priority: Priority;
   category: string;
@@ -10,3 +10,4 @@ export interface Task {
 }
 export type Status = 'ABERTA' | 'EM_ANDAMENTO' | 'CONCLUIDA';
 export type Priority = 'BAIXA' | 'MEDIA' | 'ALTA';
+export type NewTask = Pick<Task, 'title' | 'desc' | 'category' | 'priority'>;
