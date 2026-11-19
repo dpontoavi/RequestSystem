@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Task, Status, Priority, NewTask } from "../types";
+import type { NewTask } from "../types";
 
 interface newTaskModalProps {
   onClose: () => void;
@@ -13,13 +13,14 @@ const emptyTask: NewTask = {
 };
 export default function NewTaskModal({ onClose, onTaskCreated }: newTaskModalProps) {
     const [form, setForm] = useState<NewTask>(emptyTask);
+    const [ isSubmitting, setIsSubmitting ] = useState(false);
     
     function set(field: string, value: string | number) {
         setForm((prev) => ({ ...prev, [field]: value }));
     }
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
             <div className="bg-white p-6 rounded-lg w-96">
                 <h2 className="text-xl font-bold mb-4">Nova Solicitação</h2>
                 <div className="flex flex-col gap-4">
@@ -49,15 +50,26 @@ export default function NewTaskModal({ onClose, onTaskCreated }: newTaskModalPro
                             className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition-colors duration-200">
                             Cancelar
                         </button>
-                        <button onClick={() => onTaskCreated(form)}
-                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200">
-                            Criar Solicitação
+                        <button onClick={() => handleCreateTask(form)} disabled={isSubmitting}
+                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:bg-blue-300 transition-colors duration-200 ">
+                            {isSubmitting ? 'Criando...' : 'Criar Solicitação'}
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     );
+    async function handleCreateTask(task: Omit<NewTask, 'id'>) {
+    setIsSubmitting(true);
+    try {
+        await onTaskCreated(task);
+        onClose();
+    } catch (error) {
+        console.error("Erro ao criar a solicitação:", error);
+    } finally {
+        setIsSubmitting(false);
+    }
+}
 }
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
     return (
@@ -73,6 +85,7 @@ function Row({ children }: { children: React.ReactNode }) {
             {children}
         </div>
     );
+    
 }
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
     return (
