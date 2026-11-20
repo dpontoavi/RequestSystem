@@ -128,73 +128,6 @@ export function HomePage() {
     return () => document.removeEventListener("pointerdown", handleOutsideClick);
   }, []);
 
-  //test only
-  /*useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        setLoading(true);
-        // Simulate an API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setTasks([
-          {
-            id: 1,
-            title: "Task 1",
-            description: "Description for Task 1",
-            status: "ABERTA",
-            priority: "ALTA",
-            category: "Category 1",
-          },
-          {
-            id: 2,
-            title: "Task 2",
-            description: "Description for Task 2",
-            status: "EM_ANDAMENTO",
-            priority: "MEDIA",
-            category: "Category 2"
-          },
-          {
-            id: 3,
-            title: "Task 3",
-            description: "Description for Task 3",
-            status: "CONCLUIDA",
-            priority: "BAIXA",
-            category: "Category 3"
-          },
-          {
-            id: 4,
-            title: "Task 4",
-            description: "Description for Task 4",
-            status: "ABERTA",
-            priority: "ALTA",
-            category: "Category 4"
-          },
-          {
-            id: 5,
-            title: "Task 5",
-            description: "Description for Task 5",
-            status: "EM_ANDAMENTO",
-            priority: "MEDIA",
-            category: "Category 5"
-          },
-          {
-            id: 6,
-            title: "Task 6",
-            description: "Description for Task 6",
-            status: "CONCLUIDA",
-            priority: "BAIXA",
-            category: "Category 6"
-          }
-        ]);
-      } catch (err) {
-        setError("Failed to fetch tasks");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTasks();
-  }, []); */
-
   if (loading) {
     return (
     <>
@@ -350,7 +283,7 @@ export function HomePage() {
         <h1 className="text-6xl font-bold mb-4 p-5 underline">Solicitações</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 p-4">
           {tasks.map((task) => (
-            <div key={task.id} className="relative bg-gray-100 rounded-4xl shadow-md border-2 border-dashed p-4 drop-shadow-xl/15 hover:drop-shadow-xl/25 transition duration-500">
+            <div key={task.id} className="relative bg-gray-100 rounded-4xl shadow-md border-2 border-dashed p-4 drop-shadow-xl/15 hover:drop-shadow-xl/25 animate-pop-in transition duration-500">
               <div className="flex flex-col">
 
                 <div className="flex flex-row justify-between">
