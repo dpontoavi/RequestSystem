@@ -26,7 +26,7 @@ export default function NewTaskModal({ onClose, onSubmit, initialTask, mode = "c
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 animate-fade-in">
-            <div className="bg-white p-6 rounded-lg w-96">
+            <div className="bg-white p-6 rounded-4xl w-96">
                 <h2 className="text-xl font-bold mb-4">
                     {mode === "edit" ? "Editar Solicitação" : "Nova Solicitação"}
                 </h2>
