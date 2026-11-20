@@ -18,9 +18,9 @@ import io.ktor.server.routing.route
 
 fun Route.TaskRoutes(service: TaskService) {
     route("/api/requests") {
-        get {
+        /*get {
             call.respond(service.getAllTasks())
-        }
+        }*/
         get("/{id}") {
             val id = call.parameters["id"]?.toIntOrNull()
             if (id == null) {
