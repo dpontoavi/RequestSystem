@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react"
 import type { NewTask, Priority, Status, Task } from "../types"
-import { advanceTaskStatus, createTask, getTasks, searchTasks } from "../api/tasks";
+import { advanceTaskStatus, createTask, deleteTask, getTasks, searchTasks, updateTask } from "../api/tasks";
 import NewTaskModal from "../components/NewTaskModal";
 
 
@@ -21,8 +21,8 @@ function getStatusStyles(status: string): string {
 
 function getPriorityStyles(priority: string): string {
   if (priority === "BAIXA") return "bg-green-100 text-green-700";
-  if (priority === "MEDIA") return "bg-yellow-100 text-yellow-700";
-  if (priority === "ALTA") return "bg-red-100 text-red-700";
+  if (priority === "MEDIA") return "bg-yellow-100 text-yellow-700 border-2 border-dotted";
+  if (priority === "ALTA") return "bg-red-100 text-red-700 border-2";
   return "bg-gray-100 text-gray-700";
 }
 
@@ -37,6 +37,9 @@ export function HomePage() {
   const [ categoryFilter, setCategoryFilter ] = useState<string>("");
   const [ showModal, setShowModal ] = useState<boolean>(false);
   const [ pendingId, setPendingId ] = useState<number | null>(null);
+  const [ openMenuId, setOpenMenuId ] = useState<number | null>(null);
+  const [ editingTask, setEditingTask ] = useState<Task | null>(null);
+  const [ deletingTask, setDeletingTask ] = useState<Task | null>(null);
 
   const handleSearch = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,6 +65,21 @@ export function HomePage() {
     setTasks((prevTasks) => [...prevTasks, newTask]);
     setShowModal(false);
   }
+  const handleUpdateTask = async (task: NewTask) => {
+    if (!editingTask) return;
+    const updatedTask = await updateTask(editingTask.id, {
+      ...task,
+      status: editingTask.status,
+    });
+    setTasks((prevTasks) =>
+      prevTasks.map((item) => (item.id === editingTask.id ? updatedTask : item))
+    );
+    setEditingTask(null);
+  }
+  const closeTaskModal = () => {
+    setShowModal(false);
+    setEditingTask(null);
+  }
   const handleAdvanceTaskStatus = async (taskId: number) => {
     setPendingId(taskId);
     try {
@@ -69,8 +87,23 @@ export function HomePage() {
       setTasks((prevTasks) =>
         prevTasks.map((task) => (task.id === taskId ? updatedTask : task))
       );
-    } catch (error) {
+    } catch {
       setError("Failed to advance task status");
+    } finally {
+      setPendingId(null);
+    }
+  }
+  const handleDeleteTask = async () => {
+    if (!deletingTask) return;
+    const taskId = deletingTask.id;
+    setPendingId(taskId);
+    try {
+      await deleteTask(taskId);
+      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+      setOpenMenuId(null);
+      setDeletingTask(null);
+    } catch {
+      setError("Failed to delete task");
     } finally {
       setPendingId(null);
     }
@@ -82,7 +115,18 @@ export function HomePage() {
       .then(setTasks)
       .catch(() => setError("Failed to fetch tasks"))
       .finally(() => setLoading(false))
-  });
+  }, []);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest("[data-task-menu]")) return;
+      setOpenMenuId(null);
+    };
+
+    document.addEventListener("pointerdown", handleOutsideClick);
+    return () => document.removeEventListener("pointerdown", handleOutsideClick);
+  }, []);
 
   //test only
   /*useEffect(() => {
@@ -201,14 +245,17 @@ export function HomePage() {
         <div className=" z-20 flex flex-col p-4 justify-center items-center">
           <p className="flex text-gray-500 text-lg text-center p-32">Nenhuma Solicitação encontrada</p>
         
-          <button onClick={() => setShowModal(true)}
+          <button onClick={() => {
+            setEditingTask(null);
+            setShowModal(true);
+          }}
             className=" bg-radial-[at_25%_25%] from-blue-600 to-blue-400 to-75% text-white rounded-2xl flex w-120 h-16 text-4xl p-4 items-center justify-center hover:from-cyan-300 hover:to-cyan-400 transition-colors duration-400">
             Crie a primeira Solicitação
           </button>
           {showModal && (
             <NewTaskModal
-              onClose={() => setShowModal(false)}
-              onTaskCreated={handleCreateTask}
+              onClose={closeTaskModal}
+              onSubmit={handleCreateTask}
             />
           )}
         </div>
@@ -231,7 +278,7 @@ export function HomePage() {
         </button>
         <form
           onSubmit={handleSearch}
-          className={`flex items-center gap-2 overflow-hidden transition-all duration-500 ease-in-out ${searchOpen ? "w-full opacity-100 ml-2" : "w-0 opacity-0 ml-0"}`}
+          className={`flex items-center gap-2 overflow-hidden transition-all duration-500 ease-in-out ${searchOpen ? "w-full/2 opacity-100 ml-2" : "w-0 opacity-0 ml-0"}`}
         >
           <input
             type="text"
@@ -278,46 +325,134 @@ export function HomePage() {
       </div>
       { /* Tasks section */}
       <div className="fixed bottom-8 right-8 z-20 flex flex-row p-4 justify-between items-center">
-        <button onClick={() => setShowModal(true)} 
+        <button onClick={() => {
+            setEditingTask(null);
+            setShowModal(true);
+          }}
           className="leading-none  bg-radial-[at_25%_25%] items-center from-blue-600 to-blue-400 to-75% text-white rounded-full flex h-16 w-16 text-4xl items-center justify-center hover:from-cyan-300 hover:to-cyan-400 transition-colors duration-400">
             +
           </button>
           {showModal && (
             <NewTaskModal
-              onClose={() => setShowModal(false)}
-              onTaskCreated={handleCreateTask}
+              onClose={closeTaskModal}
+              onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
+              initialTask={editingTask ? {
+                title: editingTask.title,
+                desc: editingTask.desc,
+                category: editingTask.category,
+                priority: editingTask.priority,
+              } : undefined}
+              mode={editingTask ? "edit" : "create"}
             />
           )}
       </div>
       <div className="flex-1 p-4">
-        <h1 className="text-6xl font-bold mb-4 p-5">Solicitações</h1>
+        <h1 className="text-6xl font-bold mb-4 p-5 underline">Solicitações</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 p-4">
           {tasks.map((task) => (
-            <div key={task.id} className="bg-gray-300 rounded-4xl shadow-md p-4 drop-shadow-xl/15 hover:drop-shadow-xl/25 transition-shadow duration-1000">
-              <div className="flex flex-col py-4">
-                <span className="text-xl font-bold mb-2">{task.title}</span>
+            <div key={task.id} className="relative bg-gray-100 rounded-4xl shadow-md border-2 border-dashed p-4 drop-shadow-xl/15 hover:drop-shadow-xl/25 transition duration-500">
+              <div className="flex flex-col">
+
+                <div className="flex flex-row justify-between">
+                  <span className="text-xl font-bold mb-2">{task.title}</span>
+                  <div data-task-menu>
+                    <button
+                      type="button"
+                      onClick={() => setOpenMenuId((currentId) => currentId === task.id ? null : task.id)}
+                      aria-expanded={openMenuId === task.id}
+                      aria-label={`Ações para ${task.title}`}
+                      className="flex h-9 w-9 items-center mb-3 cursor-pointer shadow-lg justify-center rounded-full bg-white text-xl font-bold text-gray-700 shadow hover:bg-gray-100 transition duration-500 "
+                    >
+                      ⋯
+                    </button>
+                    {openMenuId === task.id && (
+                      <div className="absolute right-0 top-11 z-30 w-32 overflow-hidden rounded-xl bg-white py-1 shadow-lg">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingTask(task);
+                            setOpenMenuId(null);
+                            setShowModal(true);
+                          }}
+                          className="cursor-pointer block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition duration-500"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDeletingTask(task);
+                            setOpenMenuId(null);
+                          }}
+                          disabled={pendingId === task.id}
+                          className="cursor-pointer block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 transition duration-500"
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className={`rounded-2xl p-2 mb-4 text-center ${getPriorityStyles(task.priority)}`}>
+                  <span className="text-lg font-bold">{formatLabel(task.priority)}</span>
+                </div>
                 <textarea className="h-29 text-gray-600 bg-white rounded-2xl p-3">{task.desc}</textarea>
               </div>
-              <div className="flex flex-row justify-between items-center mt-4 p-4">
-                <div className={`rounded-2xl p-2 flex flex-row items-center ${getStatusStyles(task.status)}`}>
-                  <span className="text-sm">{formatLabel(task.status)}</span>
+              <div className="flex flex-col mt-4 p-4">
+                <span className="text-2xl font-semibold mb-2 underline">Status:</span>
+                <div className={`rounded-2xl p-2 flex flex-row justify-between items-center mb-4 ${getStatusStyles(task.status)}`}>
+
+                  <span className="text-lg font-semibold">{formatLabel(task.status)}</span>
                   <button onClick={() => handleAdvanceTaskStatus(task.id)} 
                     disabled={pendingId === task.id || task.status === "CONCLUIDA"} 
-                    className=" leading-0 bg-blue-500 text-white rounded-full w-8 h-8 flex text-xl items-center justify-center items-center cursor-pointer disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed ml-2">
+                    className=" leading-0 bg-blue-500 text-white rounded-full w-8 h-8 flex text-xl items-center justify-center items-center cursor-pointer disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed ml-2 hover:bg-blue-800 transition duration-300">
                     +
                   </button>
                 </div>
-                <div className={`rounded-2xl p-2 ${getPriorityStyles(task.priority)}`}>
-                  <span className="text-sm">{formatLabel(task.priority)}</span>
-                </div>
+                <span className="text-2xl font-semibold mb-2 underline">Categoria:</span>
                 <div className="bg-white rounded-2xl p-2">
-                  <span className="text-sm text-gray-500">{task.category}</span>
+                  <span className="text-lg text-gray-500">{task.category}</span>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
+      {deletingTask && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-task-title"
+            className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
+          >
+            <h2 id="delete-task-title" className="text-xl font-bold text-gray-900">
+              Excluir solicitação?
+            </h2>
+            <p className="mt-2 text-gray-600">
+              Tem certeza de que deseja excluir “{deletingTask.title}”? Esta ação não pode ser desfeita.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeletingTask(null)}
+                disabled={pendingId === deletingTask.id}
+                className="rounded-lg bg-gray-200 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteTask}
+                disabled={pendingId === deletingTask.id}
+                className="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {pendingId === deletingTask.id ? "Excluindo..." : "Excluir"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
