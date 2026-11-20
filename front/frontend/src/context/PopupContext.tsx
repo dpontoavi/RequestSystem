@@ -1,4 +1,4 @@
-import { createContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import type { ApiError } from "../types/error";
 import Popup from "../components/Popup";
 
@@ -14,3 +14,4 @@ export function PopupProvider({ children }: { children: ReactNode}) {
         </PopupContext.Provider>
     );
 }
+export const usePopup = () => useContext(PopupContext)
