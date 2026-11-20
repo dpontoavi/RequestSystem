@@ -3,7 +3,9 @@ import type { NewTask } from "../types";
 
 interface newTaskModalProps {
   onClose: () => void;
-  onTaskCreated: (task: Omit<NewTask, 'id'>) => void;
+  onSubmit: (task: NewTask) => void | Promise<void>;
+  initialTask?: NewTask;
+  mode?: "create" | "edit";
 }
 const emptyTask: NewTask = {
     title: '',
@@ -11,8 +13,8 @@ const emptyTask: NewTask = {
     category: '',
     priority: 'BAIXA',
 };
-export default function NewTaskModal({ onClose, onTaskCreated }: newTaskModalProps) {
-    const [form, setForm] = useState<NewTask>(emptyTask);
+export default function NewTaskModal({ onClose, onSubmit, initialTask, mode = "create" }: newTaskModalProps) {
+    const [form, setForm] = useState<NewTask>(initialTask ?? emptyTask);
     const [ isSubmitting, setIsSubmitting ] = useState(false);
     
     function set(field: string, value: string | number) {
@@ -22,26 +24,27 @@ export default function NewTaskModal({ onClose, onTaskCreated }: newTaskModalPro
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
             <div className="bg-white p-6 rounded-lg w-96">
-                <h2 className="text-xl font-bold mb-4">Nova Solicitação</h2>
+                <h2 className="text-xl font-bold mb-4">
+                    {mode === "edit" ? "Editar Solicitação" : "Nova Solicitação"}
+                </h2>
                 <div className="flex flex-col gap-4">
                     <Field label="Título">
-                        <input placeholder="Título" onChange={(e) => set('title', e.target.value)} />
+                        <input value={form.title} placeholder="Título" onChange={(e) => set('title', e.target.value)} />
                     </Field>
                     <Section label="Descrição">
-                        <textarea placeholder="Descrição" onChange={(e) => set('desc', e.target.value)} />
+                        <textarea value={form.desc} placeholder="Descrição" onChange={(e) => set('desc', e.target.value)} />
                     </Section>
                     <Section label="Informações">
                         <Row>
                             <Field label="Prioridade">
-                                <select onChange={(e) => set('priority', e.target.value)}>
-                                    <option value="">Selecione</option>
+                                <select value={form.priority} onChange={(e) => set('priority', e.target.value)}>
                                     <option value="BAIXA">Baixa</option>
                                     <option value="MEDIA">Média</option>
                                     <option value="ALTA">Alta</option>
                                 </select>
                             </Field>
                             <Field label="Categoria">
-                                <input placeholder="Categoria" onChange={(e) => set('category', e.target.value)} />
+                                <input value={form.category} placeholder="Categoria" onChange={(e) => set('category', e.target.value)} />
                             </Field>
                         </Row>
                     </Section>
@@ -50,19 +53,21 @@ export default function NewTaskModal({ onClose, onTaskCreated }: newTaskModalPro
                             className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition-colors duration-200">
                             Cancelar
                         </button>
-                        <button onClick={() => handleCreateTask(form)} disabled={isSubmitting}
+                        <button onClick={() => handleSubmit(form)} disabled={isSubmitting}
                             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:bg-blue-300 transition-colors duration-200 ">
-                            {isSubmitting ? 'Criando...' : 'Criar Solicitação'}
+                            {isSubmitting
+                                ? (mode === "edit" ? 'Salvando...' : 'Criando...')
+                                : (mode === "edit" ? 'Salvar' : 'Criar Solicitação')}
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     );
-    async function handleCreateTask(task: Omit<NewTask, 'id'>) {
+    async function handleSubmit(task: NewTask) {
     setIsSubmitting(true);
     try {
-        await onTaskCreated(task);
+        await onSubmit(task);
         onClose();
     } catch (error) {
         console.error("Erro ao criar a solicitação:", error);
