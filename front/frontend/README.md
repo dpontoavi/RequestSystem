@@ -1,75 +1,104 @@
-# React + TypeScript + Vite
+# Frontend - Central de Solicitações
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface web da Central de Solicitações, desenvolvida em React 19, TypeScript e Vite. O frontend permite cadastrar, listar, buscar, filtrar, editar, excluir e avançar solicitações consumindo a API em `http://localhost:8080/api/requests`.
 
-Currently, two official plugins are available:
+## Tecnologias
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS 4
+- React Router
+- Axios
+- ESLint
 
-## React Compiler
+## Pré-requisitos
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js
+- npm
+- API backend em execução na porta `8080`
 
-## Expanding the ESLint configuration
+## Instalação e execução
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Na pasta `front/frontend`:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```powershell
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Acesse a URL exibida pelo Vite. Normalmente: `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Antes de iniciar o frontend, execute a API conforme descrito em `../../back/request-system/README.md`.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Scripts disponíveis
 
+| Comando | Descrição |
+|---|---|
+| `npm run dev` | Inicia o servidor de desenvolvimento |
+| `npm run build` | Executa a compilação TypeScript e gera o build em `dist/` |
+| `npm run lint` | Executa a análise estática com ESLint |
+| `npm run preview` | Serve localmente o build de produção |
+
+## Funcionalidades da interface
+
+- Página inicial com apresentação da solução.
+- Listagem das solicitações.
+- Cadastro com título, descrição, categoria e prioridade.
+- Status inicial `ABERTA`.
+- Filtros por título, categoria, status e prioridade.
+- Consulta visual dos dados e do status atual.
+- Avanço sequencial:
+  - `ABERTA` -> `EM_ANDAMENTO`
+  - `EM_ANDAMENTO` -> `CONCLUIDA`
+- Edição dos dados da solicitação.
+- Exclusão com confirmação.
+- Estados de carregamento, erro e lista vazia.
+
+## Rotas
+
+| Rota | Página |
+|---|---|
+| `/` | Página inicial |
+| `/api/requests` | Central de solicitações |
+
+## Integração com a API
+
+As chamadas HTTP estão centralizadas em `src/api/client.ts` e `src/api/tasks.ts`.
+
+Exemplos de endpoints consumidos:
+
+- `GET /api/requests`
+- `POST /api/requests`
+- `PUT /api/requests/{id}`
+- `PATCH /api/requests/{id}`
+- `DELETE /api/requests/{id}`
+
+Os tipos de domínio ficam em `src/types/index.ts`:
+
+- `Status`: `ABERTA`, `EM_ANDAMENTO`, `CONCLUIDA`
+- `Priority`: `BAIXA`, `MEDIA`, `ALTA`
+
+## Estrutura principal
+
+```text
+src/
+  api/          chamadas HTTP
+  components/   componentes reutilizáveis e modais
+  constants/    constantes visuais e textos
+  context/      contexto da interface
+  pages/        páginas da aplicação
+  types/        tipos compartilhados
 ```
+
+## Validação
+
+Para verificar o frontend:
+
+```powershell
+npm run lint
+npm run build
+npm run dev
+```
+
+Com backend e frontend em execução, cadastre uma solicitação e confirme a integração em `http://localhost:5173/api/requests`.

@@ -1,38 +1,100 @@
-# request-system
+# Backend - Central de Solicitações
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
+API REST da Central de Solicitações, implementada com Kotlin, Ktor, Exposed R2DBC e banco H2.
 
-Here are some useful links to get you started:
- * [Ktor Documentation](https://ktor.io/docs/home.html)
- * [Ktor GitHub page](https://github.com/ktorio/ktor)
- * [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). [Request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up).
+## Tecnologias
 
+- Kotlin 2
+- Java/JDK 21
+- Ktor Netty
+- kotlinx.serialization
+- Ktor Content Negotiation e Status Pages
+- Exposed R2DBC
+- H2
+- Gradle
 
-## Features
-Here's a list of features included in this project:
+## Pré-requisitos
 
-| Name | Description |
-|------|-------------|
-| [Status Pages](https://start.ktor.io/p/io.ktor/server-status-pages) | Provides exception handling for routes |
-| [kotlinx.serialization](https://start.ktor.io/p/io.ktor/server-kotlinx-serialization) | Handles JSON serialization using kotlinx.serialization library |
-| [Content Negotiation](https://start.ktor.io/p/io.ktor/server-content-negotiation) | Provides automatic content conversion according to Content-Type and Accept headers |
-| [Exposed](https://start.ktor.io/p/org.jetbrains/server-exposed) | Adds Exposed database to your application |
-| [CORS](https://start.ktor.io/p/io.ktor/server-cors) | Enables Cross-Origin Resource Sharing (CORS) |
-| [Static Content](https://start.ktor.io/p/io.ktor/server-static-content) | Serves static files from defined locations |
+- JDK 21
+- Gradle Wrapper incluído no projeto
 
+## Executando a API
 
-## Building & Running
-To build or run the project, use one of the following tasks:
+Na pasta `back/request-system`:
 
-
-| Task | Description |
-|------|-------------|
-| `./gradlew test`    | Run the tests     |
-| `./gradlew build`   | Build the project |
-| `./gradlew run`     | Run the server    |
-
-If the server starts successfully, you'll see the following output:
+```powershell
+.\gradlew.bat run
 ```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
+
+A API ficará disponível em `http://localhost:8080`.
+
+## Scripts disponíveis
+
+| Comando | Descrição |
+|---|---|
+| `.\gradlew.bat test` | Executa os testes |
+| `.\gradlew.bat build` | Compila a aplicação e gera o artefato |
+| `.\gradlew.bat run` | Inicia o servidor |
+
+## Persistência
+
+A conexão usa R2DBC com H2 em arquivo:
+
+```text
+r2dbc:h2:file:///./h2
+```
+
+O banco é criado na raiz de `back/request-system` e os dados permanecem disponíveis após reiniciar a aplicação.
+
+## Contrato de dados
+
+```json
+{
+  "id": 1,
+  "title": "Instalar software",
+  "desc": "Solicitação de instalação",
+  "category": "TI",
+  "priority": "ALTA",
+  "status": "ABERTA"
+}
+```
+
+Valores válidos:
+
+- `status`: `ABERTA`, `EM_ANDAMENTO`, `CONCLUIDA`
+- `priority`: `BAIXA`, `MEDIA`, `ALTA`
+
+## Endpoints
+
+| Método | Rota | Resposta principal |
+|---|---|---|
+| `GET` | `/api/requests` | Lista todas as solicitações |
+| `GET` | `/api/requests/{id}` | Consulta uma solicitação |
+| `GET` | `/api/requests?status=ABERTA&priority=ALTA&title=texto&category=TI` | Lista com filtros |
+| `POST` | `/api/requests` | Cria uma solicitação em `ABERTA` |
+| `PUT` | `/api/requests/{id}` | Atualiza os dados da solicitação |
+| `PATCH` | `/api/requests/{id}` | Avança para o próximo status |
+| `DELETE` | `/api/requests/{id}` | Remove uma solicitação |
+
+## Regras de negócio
+
+- Título, descrição e categoria são obrigatórios.
+- Campos de texto vazios ou contendo apenas espaços são rejeitados.
+- Novas solicitações começam com status `ABERTA`.
+- As transições são sequenciais:
+  - `ABERTA` -> `EM_ANDAMENTO`
+  - `EM_ANDAMENTO` -> `CONCLUIDA`
+- Uma solicitação já concluída não pode avançar novamente.
+- IDs inválidos e solicitações inexistentes recebem respostas de erro.
+
+## Estrutura principal
+
+```text
+src/main/kotlin/app/
+  database/       configuração e tabelas Exposed
+  models/         modelos, enums e exceções
+  repository/     acesso e persistência de dados
+  routes/         endpoints REST
+  services/       regras de negócio
+  plugins/        configuração HTTP, serialização e erros
 ```
