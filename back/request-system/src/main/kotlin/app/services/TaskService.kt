@@ -27,7 +27,7 @@ class TaskService (private val repository: TaskRepository) {
             if (task.desc.isBlank()) add("desc")
             if (task.category.isBlank()) add("category")
         }
-        if (invalids.isNotEmpty()) throw InvalidTaskDataException("Campos obrigatórios vazios ${invalids.joinToString(", ")}")
+        if (invalids.isNotEmpty()) throw InvalidTaskDataException("Campos obrigatórios vazios: ${invalids.joinToString(", ")}")
         val newtask = task.copy(id = 0, status = Status.ABERTA, title = task.title.trim(), desc = task.desc.trim(), category = task.category.trim())
         return repository.create(newtask)
     }

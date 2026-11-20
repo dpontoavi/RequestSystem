@@ -1,5 +1,6 @@
 package com.dpontoavi.app
 
+import app.models.ErrorResponse
 import app.models.InvalidTaskDataException
 import app.models.InvalidTransitionException
 import app.models.TaskNotFoundException
@@ -12,19 +13,19 @@ import io.ktor.server.response.*
 fun Application.configureStatusPages() {
     install(StatusPages) {
         exception<Throwable> { call, cause ->
-            call.respondText(text = "500: $cause" , status = HttpStatusCode.InternalServerError)
+            call.respond(HttpStatusCode.InternalServerError, ErrorResponse(cause.message ?: "Internal Server Error"))
         }
         exception<TaskNotFoundException> { call, cause ->
-            call.respondText(text = "404: $cause", status = HttpStatusCode.NotFound)
+            call.respond(HttpStatusCode.NotFound, ErrorResponse(cause.message ?: "Solicitação não encontrada"))
         }
         exception<InvalidTransitionException> { call, cause ->
-            call.respondText(text = "409: $cause", status = HttpStatusCode.Conflict)
+            call.respond(HttpStatusCode.Conflict, ErrorResponse(cause.message ?: "Transição de estado inválida"))
         }
         exception<InvalidTaskDataException> { call, cause ->
-            call.respondText(text = "400: $cause", status = HttpStatusCode.BadRequest)
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse(cause.message ?: "$cause"))
         }
         exception<BadRequestException> { call, cause ->
-            call.respondText(text = "400: Corpo da requisição inválido; Confira se os campos foram preenchidos", status = HttpStatusCode.BadRequest)
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse(cause.message ?: "Corpo da requisição inválido; Confira se os campos foram preenchidos"))
         }
     }
 }
