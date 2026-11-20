@@ -5,12 +5,15 @@ import Popup from "../components/Popup";
 const PopupContext = createContext<(error: ApiError) => void>(() => {});
 
 export function PopupProvider({ children }: { children: ReactNode}) {
-    const [error, setError] = useState<ApiError | null>(null);
+    const [popup, setPopup] = useState<{ error: ApiError; id: number } | null>(null);
+    const show = (error: ApiError) => setPopup({ error, id: Date.now() });
 
     return (
-        <PopupContext.Provider value={setError}>
+        <PopupContext.Provider value={show}>
             {children}
-            {error && <Popup error={error} onClose={() => setError(null)} />}
+            {popup && (
+                <Popup key={popup.id} error={popup.error} onClose={() => setPopup(null)} />
+            )}
         </PopupContext.Provider>
     );
 }
