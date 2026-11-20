@@ -1,5 +1,7 @@
 import { useState } from "react";
 import type { NewTask } from "../types";
+import { toApiError } from "../api/apiError";
+import { usePopup } from "../context/PopupContext";
 
 interface newTaskModalProps {
   onClose: () => void;
@@ -16,6 +18,7 @@ const emptyTask: NewTask = {
 export default function NewTaskModal({ onClose, onSubmit, initialTask, mode = "create" }: newTaskModalProps) {
     const [form, setForm] = useState<NewTask>(initialTask ?? emptyTask);
     const [ isSubmitting, setIsSubmitting ] = useState(false);
+    const showPopup = usePopup();
     
     function set(field: string, value: string | number) {
         setForm((prev) => ({ ...prev, [field]: value }));
@@ -70,7 +73,7 @@ export default function NewTaskModal({ onClose, onSubmit, initialTask, mode = "c
         await onSubmit(task);
         onClose();
     } catch (error) {
-        console.error("Erro ao criar a solicitação:", error);
+        showPopup(toApiError(error))
     } finally {
         setIsSubmitting(false);
     }
