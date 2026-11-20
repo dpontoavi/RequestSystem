@@ -366,7 +366,7 @@ export function HomePage() {
                       ⋯
                     </button>
                     {openMenuId === task.id && (
-                      <div className="absolute right-0 top-11 z-30 w-32 overflow-hidden rounded-xl bg-white py-1 shadow-lg">
+                      <div className="absolute right-0 top-11 z-30 w-32 overflow-hidden rounded-xl bg-white py-1 shadow-lg backdrop-blur-sm z-50 animate-fade-in">
                         <button
                           type="button"
                           onClick={() => {
