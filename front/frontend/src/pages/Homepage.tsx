@@ -2,29 +2,11 @@ import { useEffect, useState, type FormEvent } from "react"
 import type { NewTask, Priority, Status, Task } from "../types"
 import { advanceTaskStatus, createTask, deleteTask, getTasks, searchTasks, updateTask } from "../api/tasks";
 import NewTaskModal from "../components/NewTaskModal";
+import { priorityLabel, priorityStyle, statusLabel, statusStyle } from "../constants/taskLabels";
 
 
 const statuses: Status[] = ["ABERTA", "EM_ANDAMENTO", "CONCLUIDA"];
 const priorities: Priority[] = ["BAIXA", "MEDIA", "ALTA"];
-
-function formatLabel(value: string): string {
-  const normalized = value.replace(/_/g, " ").toLowerCase();
-  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
-}
-
-function getStatusStyles(status: string): string {
-  if (status === "ABERTA") return "bg-green-200 text-green-700";
-  if (status === "EM_ANDAMENTO") return "bg-purple-200 text-purple-700";
-  if (status === "CONCLUIDA") return "bg-blue-200 text-blue-700";
-  return "bg-gray-100 text-gray-700";
-}
-
-function getPriorityStyles(priority: string): string {
-  if (priority === "BAIXA") return "bg-green-100 text-green-700";
-  if (priority === "MEDIA") return "bg-yellow-100 text-yellow-700 border-2 border-dotted";
-  if (priority === "ALTA") return "bg-red-100 text-red-700 border-2";
-  return "bg-gray-100 text-gray-700";
-}
 
 export function HomePage() {
   const [ tasks, setTasks ] = useState<Task[]>([]);
@@ -229,7 +211,7 @@ export function HomePage() {
           >
             <option value="">All statuses</option>
             {statuses.map((status) => (
-              <option key={status} value={status}>{formatLabel(status)}</option>
+              <option key={status} value={status}>{statusLabel[status]}</option>
             ))}
           </select>
           <select
@@ -240,7 +222,7 @@ export function HomePage() {
           >
             <option value="">All priorities</option>
             {priorities.map((priority) => (
-              <option key={priority} value={priority}>{formatLabel(priority)}</option>
+              <option key={priority} value={priority}>{priorityLabel[priority]}</option>
             ))}
           </select>
           <input
@@ -326,16 +308,16 @@ export function HomePage() {
                     )}
                   </div>
                 </div>
-                <div className={`rounded-2xl p-2 mb-4 text-center ${getPriorityStyles(task.priority)}`}>
-                  <span className="text-lg font-bold">{formatLabel(task.priority)}</span>
+                <div className={`rounded-2xl p-2 mb-4 text-center ${priorityStyle[task.priority]}`}>
+                  <span className="text-lg font-bold">{priorityLabel[task.priority]}</span>
                 </div>
                 <textarea className="h-29 text-gray-600 bg-white rounded-2xl p-3">{task.desc}</textarea>
               </div>
               <div className="flex flex-col mt-4 p-4">
                 <span className="text-2xl font-semibold mb-2 underline">Status:</span>
-                <div className={`rounded-2xl p-2 flex flex-row justify-between items-center mb-4 ${getStatusStyles(task.status)}`}>
+                <div className={`rounded-2xl p-2 flex flex-row justify-between items-center mb-4 ${statusStyle[task.status]}`}>
 
-                  <span className="text-lg font-semibold">{formatLabel(task.status)}</span>
+                  <span className="text-lg font-semibold">{statusLabel[task.status]}</span>
                   <button onClick={() => handleAdvanceTaskStatus(task.id)} 
                     disabled={pendingId === task.id || task.status === "CONCLUIDA"} 
                     className=" leading-0 bg-blue-500 text-white rounded-full w-8 h-8 flex text-xl items-center justify-center items-center cursor-pointer disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed ml-2 hover:bg-blue-800 transition duration-300">
